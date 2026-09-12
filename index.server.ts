@@ -69,7 +69,9 @@ function checkoutInstalls(): string[] {
   try {
     return fs
       .readdirSync(root)
-      .map((dir) => path.join(root, dir, "checkout", RELATIVE_ENTRY))
+      // npm installs manifest `build` dependencies under checkout/node_modules/,
+      // so the bridge lives one segment deeper than the global-root layout.
+      .map((dir) => path.join(root, dir, "checkout", "node_modules", RELATIVE_ENTRY))
       .filter((cli) => fs.existsSync(cli))
       .sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs);
   } catch {
