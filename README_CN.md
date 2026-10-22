@@ -35,11 +35,17 @@ Paseo daemon
 
 ## 安装
 
+已上架 Paseo 官方插件注册表，id 为 [`lianxin255/zcode`](https://paseo.sh/plugins)：
+
 ```bash
-paseo plugin add lianxin255/paseo-plugin-zcode
+paseo plugin add lianxin255/zcode
 paseo plugin ls                   # 期望：paseo-plugin-zcode  running
 paseo provider diagnostic zcode   # 期望：Status Ready，并列出模型
 ```
+
+用仓库 URL 安装（`paseo plugin add lianxin255/paseo-plugin-zcode`）效果相同，区别是跟踪 `main` 而不是注册表审核过的钉定版本。
+
+![Paseo 中的 ZCode 用量卡](images/zcode-usage-card.png)
 
 之后照常派活：
 

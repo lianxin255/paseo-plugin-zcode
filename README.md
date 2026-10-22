@@ -35,11 +35,17 @@ The plugin ships no UI and no protocol code. On `paseo plugin add` / `update`, t
 
 ## Install
 
+Listed in the Paseo plugin registry as [`lianxin255/zcode`](https://paseo.sh/plugins):
+
 ```bash
-paseo plugin add lianxin255/paseo-plugin-zcode
+paseo plugin add lianxin255/zcode
 paseo plugin ls                   # expect: paseo-plugin-zcode  running
 paseo provider diagnostic zcode   # expect: Status Ready, model list
 ```
+
+Installing by repository URL (`paseo plugin add lianxin255/paseo-plugin-zcode`) works the same way and tracks `main` instead of the registry's approved pin.
+
+![ZCode usage card in Paseo](images/zcode-usage-card.png)
 
 Run agents as usual:
 
