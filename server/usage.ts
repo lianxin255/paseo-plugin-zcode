@@ -27,6 +27,7 @@ const inputSchema = z.object({ account: z.string() }).strict();
 
 interface RawLimit {
   type?: unknown;
+  unit?: unknown;
   number?: unknown;
   usage?: unknown;
   remaining?: unknown;
@@ -64,11 +65,17 @@ function usedPercentOf(limit: RawLimit): number | null {
   return clampPercent(asFiniteNumber(limit.percentage));
 }
 
-// GLM convention: TOKENS_LIMIT number 5 → the 5-hour window, 7 → weekly.
-// Everything else falls back to the raw type string so new windows still show.
-function describeLimit(limit: RawLimit): { id: string; label: string; shortLabel: string; summary: boolean } {
+// GLM convention: legacy payloads name token windows TOKENS_LIMIT with
+// number 5 → the 5-hour window, 7 → weekly; current payloads send the same
+// windows as CREDIT_LIMIT with a numeric unit (3 = hour, 6 = week), which
+// must resolve to the same semantic ids. Include reported unit/number in
+// fallback ids to distinguish windows with the same unrecognized type.
+export function describeLimit(
+  limit: RawLimit,
+): { id: string; label: string; shortLabel: string; summary: boolean } {
   const type = typeof limit.type === "string" ? limit.type : "";
   const number = asFiniteNumber(limit.number);
+  const unit = asFiniteNumber(limit.unit);
   if (type === "TOKENS_LIMIT") {
     if (number === 5) return { id: "token_5h", label: "5-hour", shortLabel: "5h", summary: true };
     if (number === 7) return { id: "token_week", label: "Weekly", shortLabel: "wk", summary: true };
@@ -79,8 +86,17 @@ function describeLimit(limit: RawLimit): { id: string; label: string; shortLabel
   if (type === "MCP_LIMIT" || type === "TIME_LIMIT") {
     return { id: "mcp", label: "MCP", shortLabel: "mcp", summary: false };
   }
+  if (type === "CREDIT_LIMIT" && unit === 3 && number === 5) {
+    return { id: "token_5h", label: "5-hour", shortLabel: "5h", summary: true };
+  }
+  if (type === "CREDIT_LIMIT" && unit === 6 && number === 1) {
+    return { id: "token_week", label: "Weekly", shortLabel: "wk", summary: true };
+  }
   const fallback = type || "Quota";
-  return { id: fallback.toLowerCase(), label: fallback, shortLabel: "", summary: false };
+  const parts = [fallback.toLowerCase()];
+  if (unit !== null) parts.push(`u${unit}`);
+  if (number !== null) parts.push(`n${number}`);
+  return { id: parts.join("_"), label: fallback, shortLabel: "", summary: false };
 }
 
 function zcodeHome(): string {
