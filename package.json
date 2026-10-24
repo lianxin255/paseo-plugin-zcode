@@ -12,6 +12,7 @@
   "private": true,
   "scripts": {
     "typecheck": "tsc --noEmit",
+    "test": "tsc server/usage.ts --outDir dist-plugin --rootDir . --module esnext --target es2022 --moduleResolution bundler --skipLibCheck --esModuleInterop && node scripts/test-usage.mjs",
     "smoke": "tsc index.server.ts server/usage.ts --outDir dist-plugin --module esnext --target es2022 --moduleResolution bundler --skipLibCheck --esModuleInterop && node scripts/smoke.mjs"
   },
   "dependencies": {
